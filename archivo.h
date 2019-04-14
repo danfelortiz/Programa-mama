@@ -31,10 +31,8 @@ void imprimir_r(const char* name, Factura cambio);
 
 void cuenta_factura(Factura transaccion)
 {
-    std::wcout << L"1" << std::endl;
     const char* name = "/home/daniel/Yo/Mamá/Widget_program/cuentas_pagar.csv";
     std::vector<std::vector<Factura> > cuenta_empresa = leer_cuenta(name);
-    std::wcout << L"2" << std::endl;
     int contador = 0;
     for(int i=0; i<cuenta_empresa.size(); i++){
         if(cuenta_empresa[i][0].empresa == transaccion.empresa){
@@ -55,9 +53,7 @@ void cuenta_factura(Factura transaccion)
 
 std::vector<std::vector<Factura> > leer_cuenta(const char* name)
 {
-    std::wcout << L"1.1" << std::endl;
     std::vector<std::vector<std::wstring> > archivo = leer_archivo(name);
-    std::wcout << L"1.2" << std::endl;
     std::vector<std::vector<Factura> > cuenta_empresa;
     int k=0;
     for(int i=0; i<archivo.size(); i++){

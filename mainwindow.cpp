@@ -4,7 +4,6 @@
 #include "clases.h"
 #include "inventario.h"
 #include "z.h"
-#include "precios.h"
 #include "archivo.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -51,9 +50,7 @@ void MainWindow::on_aceptar_z_clicked()
     const char* nuevo = new_dir.c_str();
 
     std::vector<std::vector<std::wstring> > z_ar = z_leer(nuevo);
-
     std::vector<std::vector<std::vector<std::wstring> > > z_par = z_partes(z_ar);
-
     std::vector<std::tuple<std::wstring, std::wstring, std::wstring, std::vector<Producto> > > z_r = z_REG(z_par);
 
     const char* name = "/home/daniel/Yo/Mamá/Widget_program/registro_diario.csv";
@@ -64,8 +61,6 @@ void MainWindow::on_aceptar_z_clicked()
 
     const char* direction = "/home/daniel/Yo/Mamá/Widget_program/inventario.csv";
     inventario_z(direction, z_r);
-    //const char* name = "/home/daniel/Yo/Mamá/Widget_program/z_REG.csv";
-    //imprimir_z(name,z_r);
 
 }
 
@@ -77,42 +72,66 @@ void MainWindow::on_cancelar_z_clicked()
 void MainWindow::on_leer_ar_com_clicked()
 {
     const char* name = "/home/daniel/Yo/Mamá/Widget_program/compra.csv";
-    std::wcout << "Error" << std::endl;
     std::vector<std::vector<std::wstring> > archivo = leer_archivo(name);
-    std::wcout << "Error" << std::endl;
-    Factura mio = organizar_archivo(archivo);
-    std::wcout << "Error" << std::endl;
-    std::wstring ws_empresa = mio.empresa;
+    Factura empresa = organizar_archivo(archivo);
+    std::wstring ws_empresa = empresa.empresa;
     std::string s_empresa(ws_empresa.begin(), ws_empresa.end());
     std::string dir("/home/daniel/Yo/Mamá/Widget_program/");
     std::string ext(".csv");
     std::string name2 = dir + s_empresa + ext;
-    std::wcout << "Error" << std::endl;
     const char* name3 = name2.c_str();
-    std::wcout << "Error" << std::endl;
-    imprimir_r(name3, mio);
-    cuenta_factura(mio);
-    /*
-    const char* name4 = "/home/daniel/Yo/Mamá/Widget_program/cuentas_pagar.csv";
-    imprimir_cuenta(name4,);
-    */
+    imprimir_r(name3, empresa);
+    cuenta_factura(empresa);
+
+    const char* nuevo = "/home/daniel/Yo/Mamá/Widget_program/inventario.csv";
+    std::vector<std::vector<std::wstring> > leyo = leer_inventario(nuevo);
+    std::vector<Producto> para = inventario_organizado(leyo);
+
+    std::vector<Producto> productos = empresa.productos;
+    for(unsigned int i=0; i<productos.size(); i++){
+        for(unsigned int j=0; j<para.size(); j++){
+            if(productos[i].codigo == para[j].codigo){
+                para[j].cantidad += productos[i].cantidad;
+                break;
+            }
+        }
+    }
+
+    const char* name1 = "/home/daniel/Yo/Mamá/Widget_program/inventario1.csv";
+    inventario_imprimir(name1, para);
 }
 
 void MainWindow::on_leer_ar_ven_clicked()
 {
     const char* name = "/home/daniel/Yo/Mamá/Widget_program/venta.csv";
     std::vector<std::vector<std::wstring> > archivo = leer_archivo(name);
-    imprmir_archivo(archivo);
-    Factura mio = organizar_archivo(archivo);
-    std::wstring ws_empresa = mio.empresa;
+    Factura empresa = organizar_archivo(archivo);
+    std::wstring ws_empresa = empresa.empresa;
     std::string s_empresa(ws_empresa.begin(), ws_empresa.end());
     std::string dir("/home/daniel/Yo/Mamá/Widget_program/");
     std::string ext(".csv");
     std::string name2 = dir + s_empresa + ext;
     const char* name3 = name2.c_str();
-    imprimir_r(name3, mio);
+    imprimir_r(name3, empresa);
+
+    const char* nuevo = "/home/daniel/Yo/Mamá/Widget_program/inventario.csv";
+    std::vector<std::vector<std::wstring> > leyo = leer_inventario(nuevo);
+    std::vector<Producto> para = inventario_organizado(leyo);
+
+    std::vector<Producto> productos = empresa.productos;
+    for(unsigned int i=0; i<productos.size(); i++){
+        for(unsigned int j=0; j<para.size(); j++){
+            if(productos[i].codigo == para[j].codigo){
+                para[j].cantidad = para[j].cantidad - productos[i].cantidad;
+                break;
+            }
+        }
+    }
+
+    const char* name1 = "/home/daniel/Yo/Mamá/Widget_program/inventario1.csv";
+    inventario_imprimir(name1, para);
 }
-//Esta función esta incompleta porque no hay lista de precios, por lo tanto toca hacer una lista de precios y su función para leer e imprimir.
+
 void MainWindow::on_aceptar_pp_clicked()
 {
     const QString &lcodigo = ui->line_co_pp->text();
@@ -124,8 +143,8 @@ void MainWindow::on_aceptar_pp_clicked()
     int iprecio = std::stoi(sprecio);
 
     const char* nuevo = "/home/daniel/Yo/Mamá/Widget_program/inventario1.csv";
-    std::vector<std::vector<std::wstring> > leyo = leer_precios(nuevo);
-    std::vector<Producto> para = organizar_precios(leyo);
+    std::vector<std::vector<std::wstring> > leyo = leer_inventario(nuevo);
+    std::vector<Producto> para = inventario_organizado(leyo);
 
     for(unsigned int i=0; i<para.size(); i++){
         if(para[i].codigo == icodigo){
@@ -134,7 +153,7 @@ void MainWindow::on_aceptar_pp_clicked()
         }
     }
 
-    imprimir_precios(nuevo, para);
+    inventario_imprimir(nuevo, para);
 }
 
 void MainWindow::on_cancelar_pp_clicked()
@@ -174,11 +193,12 @@ void MainWindow::on_aceptar_np_clicked()
     ipara.push_back(mercancia);
     inventario_imprimir(inuevo, ipara);
 
+    /*
     const char* lnuevo = "/home/daniel/Yo/Mamá/Widget_program/lista.csv";
     std::vector<std::vector<std::wstring> > lleyo = leer_precios(lnuevo);
     std::vector<Producto> lpara = organizar_precios(lleyo); lpara.push_back(mercancia);
     imprimir_precios(lnuevo, lpara);
-
+    */
 }
 
 void MainWindow::on_cancelar_np_clicked()
