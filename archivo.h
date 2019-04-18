@@ -6,6 +6,7 @@
 #include <wchar.h>
 #include <tuple>
 #include <locale>
+#include <typeinfo>
 #include "clases.h"
 
 //Esta función lee y organiza el archivo cuenta.
@@ -13,7 +14,7 @@ std::vector<std::vector<Factura> > leer_cuenta(const char* name);
 //Esta función imprime el archivo cuenta.
 void imprimir_cuenta(const char* name, std::vector<std::vector<Factura> > &y);
 //Esta función me agrega la factura transacción al archivo de cuentas
-void cuenta_factura(Factura transaccion);
+void cuenta_factura(const char* name, Factura transaccion);
 //Esta función lee el archivo name.
 std::vector<std::vector<std::wstring> > leer_archivo(const char* name);
 //Esta función imprime la compra en la terminal.
@@ -29,12 +30,13 @@ void imprimir_r(const char* name, Factura cambio);
 
 
 
-void cuenta_factura(Factura transaccion)
+void cuenta_factura(const char* name, Factura transaccion)
 {
-    const char* name = "/home/daniel/Yo/Mamá/Widget_program/cuentas_pagar.csv";
     std::vector<std::vector<Factura> > cuenta_empresa = leer_cuenta(name);
+    std::wcout << L"8\t" << transaccion.costo_total << std::endl;
     int contador = 0;
     for(int i=0; i<cuenta_empresa.size(); i++){
+        std::wcout << L"9\t" << cuenta_empresa[i][0].costo_total << std::endl;
         if(cuenta_empresa[i][0].empresa == transaccion.empresa){
             cuenta_empresa[i].push_back(transaccion);
             contador++;
@@ -66,7 +68,9 @@ std::vector<std::vector<Factura> > leer_cuenta(const char* name)
                 cuenta.numero = archivo[i+j][0];
                 cuenta.f_entrega = fecha(archivo[i+j][1]);
                 cuenta.f_pago = fecha(archivo[i+j][2]);
+                std::wcout << L"6\t" << archivo[i+j][3] << std::endl;
                 cuenta.costo_total = std::stoi(archivo[i+j][3]);
+                std::wcout << L"7\t" << cuenta.costo_total << std::endl;
                 cuenta_empresa[k].push_back(cuenta);
                 j++;
             }
@@ -81,6 +85,7 @@ std::vector<std::vector<Factura> > leer_cuenta(const char* name)
 
 void imprimir_cuenta(const char* name, std::vector<std::vector<Factura> > &y)
 {
+    std::wstring fecha_entrega, fecha_pago;
     std::wofstream fout(name);
     fout.imbue(std::locale(""));
 
@@ -89,18 +94,26 @@ void imprimir_cuenta(const char* name, std::vector<std::vector<Factura> > &y)
         for(int j=0; j<y[i].size(); j++){
             fout << y[i][j].numero << L"\t";
             for(int k=0; k<y[i][j].f_entrega.size(); k++){
-                fout << y[i][j].f_entrega[k] << L" ";
+                fecha_entrega.append(y[i][j].f_entrega[k]);
+                fecha_entrega.append(L" ");
             }
-            fout << L"\t";
+            fecha_entrega.pop_back();
+            fout << fecha_entrega << L"\t";
+            fecha_entrega.clear();
             for(int k=0; k<y[i][j].f_pago.size(); k++){
-                fout << y[i][j].f_pago[k] << L" ";
+                fecha_pago.append(y[i][j].f_pago[k]);
+                fecha_pago.append(L" ");
             }
-            fout << L"\t";
-            fout << y[i][j].costo_total << L"\n";
+            fecha_pago.pop_back();
+            fout << fecha_pago << L"\t";
+            fecha_pago.clear();
+            std::wcout << L"10\t" << y[i][j].costo_total << std::endl;
+            std::wcout << typeid(y[i][j].costo_total).name() << std::endl;
+            fout << (int)y[i][j].costo_total << L"\n";
+            std::wcout << L"11\t" << y[i][j].costo_total << std::endl;
         }
         fout << L"\n\n";
     }
-
     fout.close();
 }
 
@@ -173,7 +186,9 @@ Factura organizar_archivo(std::vector<std::vector<std::wstring> > &y)
         transaccion.productos.push_back(producto);
     }
 
+    std::wcout << L"1\t" << y[y.size()-1][1] << std::endl;
     transaccion.costo_total = std::stoi(y[y.size()-1][1]);
+    std::wcout << L"2\t" << transaccion.costo_total << std::endl;
 
     return transaccion;
 }
@@ -253,8 +268,9 @@ void imprimir_r(const char* name, Factura cambio)
         fout << tab << cambio.productos[i].nombre << tab << codigo << tab << cantidad << enter;
     }
     fout << enter;
+    std::wcout << L"4\t" << cambio.costo_total << std::endl;
     fout << L"Costo total:" << tab << cambio.costo_total << doble_enter << enter;
-
+    std::wcout << L"5\t" << cambio.costo_total << std::endl;
     fout.close();
 }
 

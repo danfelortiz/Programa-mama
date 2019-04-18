@@ -81,7 +81,8 @@ void MainWindow::on_leer_ar_com_clicked()
     std::string name2 = dir + s_empresa + ext;
     const char* name3 = name2.c_str();
     imprimir_r(name3, empresa);
-    cuenta_factura(empresa);
+    const char* cuenta = "/home/daniel/Yo/Mamá/Widget_program/cuentas_pagar.csv";
+    cuenta_factura(cuenta, empresa);
 
     const char* nuevo = "/home/daniel/Yo/Mamá/Widget_program/inventario.csv";
     std::vector<std::vector<std::wstring> > leyo = leer_inventario(nuevo);
@@ -106,6 +107,7 @@ void MainWindow::on_leer_ar_ven_clicked()
     const char* name = "/home/daniel/Yo/Mamá/Widget_program/venta.csv";
     std::vector<std::vector<std::wstring> > archivo = leer_archivo(name);
     Factura empresa = organizar_archivo(archivo);
+    std::wcout << L"3\t" << empresa.costo_total << std::endl;
     std::wstring ws_empresa = empresa.empresa;
     std::string s_empresa(ws_empresa.begin(), ws_empresa.end());
     std::string dir("/home/daniel/Yo/Mamá/Widget_program/");
@@ -113,6 +115,8 @@ void MainWindow::on_leer_ar_ven_clicked()
     std::string name2 = dir + s_empresa + ext;
     const char* name3 = name2.c_str();
     imprimir_r(name3, empresa);
+    const char* cuenta = "/home/daniel/Yo/Mamá/Widget_program/cuentas_cobrar.csv";
+    cuenta_factura(cuenta, empresa);
 
     const char* nuevo = "/home/daniel/Yo/Mamá/Widget_program/inventario.csv";
     std::vector<std::vector<std::wstring> > leyo = leer_inventario(nuevo);
