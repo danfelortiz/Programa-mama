@@ -342,7 +342,7 @@ void inventario_z(const char* name_in, std::vector<std::tuple<std::wstring, std:
     }
 
     std::wcout << L"Salí" << std::endl;
-    const char* direction = "/home/daniel/Yo/Mamá/Widget_program/inventario1.csv";
+    const char* direction = "..\\..\\MACC\\inventario1.csv";
     inventario_imprimir(direction, para);
 
 }
